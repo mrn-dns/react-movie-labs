@@ -3,29 +3,33 @@ import PageTemplate from '../components/templateMovieListPage'
 import { getUpcomingMovies } from "../api/tmdb-api";
 // import AddToFavoritesIcon from '../components/cardIcons/addToFavorites'
 import AddToWatch from '../components/cardIcons/addToWatch'
+import Spinner from '../components/spinner';
+import { useQuery } from "react-query";
 
 const UpcomingMoviePage = (props) => {
+  const { data, error, isLoading, isError } = useQuery('upcoming', getUpcomingMovies)
   const [movies, setMovies] = useState([]);
-//   const favorites = upcomingMovies.filter(m => m.favorite)
-//   localStorage.setItem('favorites', JSON.stringify(favorites))
 
-//   const addToFavorites = (movieId) => {
-//     const updatedUpcomingMovies = upcomingMovies.map((m) =>
-//       m.id === movieId ? { ...m, favorite: true } : m
-//     );
-//     setUpcomingMovies(updatedUpcomingMovies);
-//   };
+  if (isLoading) {
+    return <Spinner />
+  }
 
-  useEffect(() => {
-    getUpcomingMovies().then(movies => {
-      setMovies(movies);
-    });
-  }, []);
+  if (isError) {
+    return <h1>{error.message}</h1>
+  } 
+
+  const upcomingMovies = data.results;
+
+  // useEffect(() => {
+  //   getUpcomingMovies().then(movies => {
+  //     setMovies(movies);
+  //   });
+  // }, []);
 
   return (
     <PageTemplate
       title='Upcoming Movies'
-      movies={movies}
+      movies={upcomingMovies}
       action={(movie) => {
         return <AddToWatch movie={movie} />
       }}
